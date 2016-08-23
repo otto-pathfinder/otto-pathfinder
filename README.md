@@ -14,7 +14,7 @@ Node.js
 3. Install modules
 4. sudo npm install forever -g
 5. sudo forever start sankey.js
-6. Access OTTO Pathfinder at http://<server-ip>:<port>
+6. Access OTTO Pathfinder at http://\<server-ip\>:\<port\>
 
 
 # MongoDB structure
@@ -22,6 +22,7 @@ Each Sankey diagram is stored as a collection in MongoDB. Each collection contai
 
 
 # Sample json Structure representing one path:
+```
 {
     "p-1" : { /*Step -1*/
         "PC" : "Einstiegsseite", /*Hierarchy 1; e.g. Page type*/
@@ -60,8 +61,11 @@ Each Sankey diagram is stored as a collection in MongoDB. Each collection contai
     "date" : ISODate("2016-08-23T12:00:00.000Z"),
     "count" : 1 /*Number of paths with this structure*/
 }
+```
+
 
 # Sample json Structure representing metadata:
+```
 {
     "metadata" : {
         "date" : {
@@ -134,3 +138,8 @@ Each Sankey diagram is stored as a collection in MongoDB. Each collection contai
         ]
     }
 }
+```
+
+# Third party licence 
+- Material Design Icons (CC-BY 4.0) https://design.google.com/icons/ 
+- ClearSans (Apache 2.0 License) https://01.org/clear-SANS 
