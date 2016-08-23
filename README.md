@@ -4,17 +4,18 @@ With OTTO Pathfinder we invented a great tool which offers the ability to intera
 
 # Requirements
 Web Server
-MongoDb
+MongoDB
 Node.js
 
 
 # Installation
 1. Upload all files to the server 
-2. Adjust config.json
-3. Install modules
-4. sudo npm install forever -g
-5. sudo forever start sankey.js
-6. Access OTTO Pathfinder at http://\<server-ip\>:\<port\>
+2. Navigate to OTTO Pathfinder folder
+3. Adjust config.json
+4. sudo npm install
+5. sudo npm install forever -g
+6. sudo forever start sankey.js
+7. Access OTTO Pathfinder at http://\<server-ip\>:\<port\>
 
 
 # MongoDB structure
@@ -25,28 +26,28 @@ Each Sankey diagram is stored as a collection in MongoDB. Each collection contai
 ```
 {
     "p-1" : { /*Step -1*/
-        "PC" : "Einstiegsseite", /*Hierarchy 1; e.g. Page type*/
+        "PC" : "Entrysite", /*Hierarchy 1; e.g. Page type*/
         "N1" : "herrenmode", /*Hierarchy 2; e.g. Page name*/
-        "N2" : "Einstiegsseite", /*Hierarchy 3*/
-        "N3" : "Einstiegsseite" /*Hierarchy 4*/
+        "N2" : "Entrysite", /*Hierarchy 3*/
+        "N3" : "Entrysite" /*Hierarchy 4*/
     },
     "p0" : { /*Step 0*/
-        "PC" : "Pagetype", /*Hierarchy 1; e.g. Page type*/
-        "N1" : "Pagename", /*Hierarchy 2; e.g. Page name*/
+        "PC" : "Storefront", /*Hierarchy 1; e.g. Page type*/
+        "N1" : "homepage", /*Hierarchy 2; e.g. Page name*/
         "N2" : "hierarchie_level3", /*Hierarchy 3*/
         "N3" : "hierarchie_level4" /*Hierarchy 4*/
     },
     "p1" : { /*Step 1*/
-        "PC" : "Einstiegsseite", /*Hierarchy 1; e.g. Page type*/
+        "PC" : "Entrysite", /*Hierarchy 1; e.g. Page type*/
         "N1" : "herrenmode", /*Hierarchy 2; e.g. Page name*/
-        "N2" : "Einstiegsseite", /*Hierarchy 3*/
-        "N3" : "Einstiegsseite" /*Hierarchy 4*/
+        "N2" : "Entrysite", /*Hierarchy 3*/
+        "N3" : "Entrysite" /*Hierarchy 4*/
     },
     "p2" : { /*Step 2*/
-        "PC" : "Produktliste", /*Hierarchy 1; e.g. Page type*/
+        "PC" : "Entrysite", /*Hierarchy 1; e.g. Page type*/
         "N1" : "herrenmode", /*Hierarchy 2; e.g. Page name*/
-        "N2" : "kategorien", /*Hierarchy 3*/
-        "N3" : "hosen" /*Hierarchy 4*/
+        "N2" : "shirts", /*Hierarchy 3*/
+        "N3" : "Entrysite" /*Hierarchy 4*/
     },
     "p3" : { /*Exit-Step*/
         "PC" : "#exit",
@@ -90,11 +91,11 @@ Each Sankey diagram is stored as a collection in MongoDB. Each collection contai
             "ordervalue" : "Order value in EUR"
         },
         "info" : {  /*Variables that are shown in tooltip*/
-            "size" : "Gerätegröße"
+            "size" : "Screen size"
         },
         "filter" : [ 
             {
-                "label" : "Gerätegröße",
+                "label" : "Screen size",
                 "type" : "multilist",
                 "field" : "device",
                 "default" : false,
