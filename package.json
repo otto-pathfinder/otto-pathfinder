@@ -1,0 +1,14 @@
+{
+	"name": "OTTO SankeyEngine",
+	"description": "OTTO SankeyEngine",
+	"author": "OTTO GmbH & Co. KG",
+	"dependencies" : {
+		"cluster": "*",
+		"express": "*",
+		"jade": "*",
+		"socket.io": "*",
+		"mongodb": "*",
+		"stylus": "*",
+		"nib": "*"
+	}
+}

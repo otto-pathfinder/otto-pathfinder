@@ -1,0 +1,6 @@
+input(type='search',placeholder='Datenquelle suchen',onkeyup='search(this);')
+div
+	each val in params.collections
+		.box.is-dropdown
+			h1(onclick="help_database(this);")=val.name
+			div

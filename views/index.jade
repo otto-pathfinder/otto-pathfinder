@@ -1,0 +1,72 @@
+- var letter = '';
+extend layout
+block content
+	script(type='text/javascript')
+		| if (!localStorage || !localStorage.settings) { help(1); }
+		| document.currentScript.remove();
+	
+block sidebar
+	.help(onmouseover="help(1, false, undefined, true);", onmouseout="help(0);")
+		label(for='base') Datenquelle
+		.material-icons live_help
+	form(onsubmit='conf_submit(event, this);')
+		select#base(name='base',required,onchange='load_base_param(this.value);close_bubble(document.querySelector(".inithelp"));')
+			option(value='',disabled,selected) - Bitte wählen -
+			each val in params.collections
+				- if (letter !== val.name.replace(/[\_ ].*/, ''))
+					- letter = val.name.replace(/[\_ ].*/, '')
+					option(value='',disabled)
+					option(value='',disabled,style="font-size:1.5em;background-color:rgb(190,190,190);color:white;")=letter
+				option(value=val.name)=val.name
+		#settings.is-invisible
+			.area
+				.help(onmouseover="help(2, false, undefined, true);", onmouseout="help(0);")
+					label(for='VorkommenMin') Vorkommen
+					.material-icons live_help
+				input#VorkommenMin(onfocus="/*help(2)*/",onkeyup='if (redodata && redodata.set === true) { window.clearTimeout(redodata.timeout); redodata.timeout = window.setTimeout(function () { d3sankey(redodata.target, redodata.data, redodata.attr); }, 500); }',onchange='if (redodata && redodata.set === true) { window.clearTimeout(redodata.timeout); redodata.timeout = window.setTimeout(function () { d3sankey(redodata.target, redodata.data, redodata.attr); }, 500); }',autofocus,name='vorkommen_min',type='number',disabled,required)
+				input#VorkommenMax(onfocus="/*help(2)*/",onkeyup='if (redodata && redodata.set === true) { window.clearTimeout(redodata.timeout); redodata.timeout = window.setTimeout(function () { d3sankey(redodata.target, redodata.data, redodata.attr); }, 500); }',onchange='if (redodata && redodata.set === true) { window.clearTimeout(redodata.timeout); redodata.timeout = window.setTimeout(function () { d3sankey(redodata.target, redodata.data, redodata.attr); }, 500); }',name='vorkommen_max',type='number',disabled,required)
+			.area
+				.help(onmouseover="help(3, false, undefined, true);", onmouseout="help(0);")
+					label(for='SchritteMin') Schritte
+					.material-icons live_help
+				input#SchritteMin(onfocus="/*help(3)*/",name='schritt_min',type='number',disabled,required)
+				input#SchritteMax(onfocus="/*help(3)*/",name='schritt_max',type='number',disabled,required)
+			.area
+				.help(onmouseover="help(4, false, undefined, true);", onmouseout="help(0);")
+					label(for='ZeitraumMin') Zeitraum
+					.material-icons live_help
+				input.fwidth#ZeitraumMin(onfocus="/*help(4)*/",name='zeitraum_min',type='datetime-local',disabled,required)
+				input.fwidth#ZeitraumMax(onfocus="/*help(4)*/",name='zeitraum_max',type='datetime-local',disabled,required)
+			.area
+				.help(onmouseover="help(5, false, undefined, true);", onmouseout="help(0);")
+					label(for='Sum') Kumulierung
+					.material-icons live_help
+				select#Sum(onfocus="/*help(5)*/",name='sum',disabled,required)
+			#filter
+			
+			.area
+				button#btn(onfocus="help(0)") Sankey generieren
+			.area
+				.help(onmouseover="var y = this.getBoundingClientRect().top; help(8, false, [237, y], true);", onmouseout="help(0);")
+					label
+						span.material-icons(style="font-size:16px; margin-right:5px; margin-top:-1px;") filter_list
+						| Drilldown
+					.material-icons live_help
+				ul#DrilldownList
+					li Kein Drilldown hinterlegt
+			.area
+				.help(onmouseover="var y = this.getBoundingClientRect().top; help(9, false, [237, y], true);", onmouseout="help(0);")
+					label
+						span.material-icons(style="font-size:16px; margin-right:5px; margin-top:-1px;") add_circle
+						| Knoten
+					.material-icons live_help
+				ul#ImportantList
+					li Keine wichtigen Knoten definiert
+			.area
+				.help(onmouseover="var y = this.getBoundingClientRect().top; help(10, false, [237, y], true);", onmouseout="help(0);")
+					label
+						span.material-icons(style="font-size:16px; margin-right:5px; margin-top:-1px;") remove_circle
+						| Knoten
+					.material-icons live_help
+				ul#HiddenList
+					li Keine versteckten Knoten definiert

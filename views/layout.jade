@@ -1,0 +1,47 @@
+doctype
+html
+	head
+		title=config.title 
+		
+		meta(http-equiv='X-UA-Compatible', content="IE=Edge,chrome=1")
+		meta(name='language', content='de')
+		meta(http-equiv='content-language', content='de')
+		meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
+		
+		link(rel='stylesheet', href='/style/main.css')
+		
+		script(type='text/javascript', src='./socket.io/socket.io.js')
+		script(type='text/javascript', src='//d3js.org/d3.v3.min.js', charset='utf-8')
+		script(type='text/javascript', src='./js/main.js')
+		script(type='text/javascript')
+			| url = "#{config.url}";
+			| port = #{config.port};
+
+	body
+		header
+			h1=config.title
+			menu
+				div(onclick="sourcesinfo();")
+					span.material-icons storage
+					| Datenquelleninformationen
+				div(onclick="save();")
+					span.material-icons save
+					| Speichern
+				div(onclick="load();")
+					span.material-icons archive
+					| Laden
+				div(onclick="csv();")
+					span.material-icons file_download
+					| CSV Export
+				each val in config.menu
+					div(onclick="#{val.action}")
+						- if (val.icon !== false)
+							span.material-icons=val.icon
+						| #{val.label}
+		.container
+			.main-content
+				block content
+			.sidebar
+				block sidebar
+		footer
+			p &copy; SankeyEngine by Otto (GmbH & Co KG) &bull; Werner-Otto-Straße 1-7 &bull; 22179 Hamburg &bull; dept. SE-KL-SC-CF / Thomas Dick
