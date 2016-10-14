@@ -1,3 +1,6 @@
+![alt tag](https://raw.githubusercontent.com/otto-pathfinder/otto-pathfinder/master/pathfinder.png)
+
+
 # otto-pathfinder
 With OTTO Pathfinder we invented a great tool which offers the ability to interactively analyze paths.
 
