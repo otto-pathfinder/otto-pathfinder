@@ -147,4 +147,4 @@ Each Sankey diagram is stored as a collection in MongoDB. Each collection contai
 # Third party licence 
 - Material Design Icons (CC-BY 4.0) https://design.google.com/icons/ 
 - ClearSans (Apache 2.0 License) https://01.org/clear-SANS 
-- Many thanks to Mike Bostock (https://bost.ocks.org/mike/sankey/) and Tom Counsell (http://tamc.github.io/Sankey/), whose Sankey library provided inspiration for this example.
+- Many thanks to Mike Bostock (https://bost.ocks.org/mike/sankey/), whose Sankey library provided basic code and inspiration.
