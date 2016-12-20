@@ -1,9 +1,25 @@
+
 ![alt tag](https://raw.githubusercontent.com/otto-pathfinder/otto-pathfinder/master/pathfinder.png)
 
 
 # otto-pathfinder
 With OTTO Pathfinder we invented a great tool which offers the ability to interactively analyze paths.
 
+![screenshot1](https://cloud.githubusercontent.com/assets/21034961/21355184/4fac1522-c6cd-11e6-9ee2-e8dcd6914c9f.PNG)
+
+The user has the possibility to filter paths, to drill certain nodes up to three levels of detail (e.g. from the assortment to the product or from page types to ever finer page names), to select the number of the displayed steps within the journey, to display only the paths of visitors of specific marketing channels and many more options.
+
+![screenshot2](https://cloud.githubusercontent.com/assets/21034961/21355191/59b20734-c6cd-11e6-8ed3-09a3291079e4.PNG)
+
+Not only the absolute, but also the percentage occurrences of the paths are displayed (share of the current view, not share of total).
+
+![screenshot](https://cloud.githubusercontent.com/assets/21034961/21355196/5f446200-c6cd-11e6-94f7-30394b9dd357.PNG)
+
+It is now possible to save different views (drilldowns and filters) in the webbrowser and reload them later.
+
+![screenshot4](https://cloud.githubusercontent.com/assets/21034961/21355457/5c119aa2-c6ce-11e6-8e70-9409c75f9e84.PNG)
+
+A view that has been saved in the browser previously can be reloaded via the "Load Sankey" function. Here the stored drilldowns and filters are applied to the current data of the Sankey database.
 
 # Requirements
 Web Server
