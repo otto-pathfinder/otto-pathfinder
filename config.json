@@ -1,19 +1,19 @@
 {
-	"url":			"[URL]",
-	"port": 		3000,
-	"title": 		"OTTO Pathfinder",
-	"compress_css": true,
-	"menu":			[
-		{
-			"icon": "[Google Material Icon Name]",
-			"label": "[Link Text]",
-			"action": "[Javascript Code]"
-		}
-	],
-	"mongodb": 		{
-						"user": "[User Name]",
-						"pass": "[Password]",
-						"base": "[Database Name]",
-						"host": "[Host Name]"
-					}
+  "url": "[URL]",
+  "port": 3000,
+  "title": "OTTO Pathfinder",
+  "compress_css": true,
+  "menu": [
+    {
+      "icon": "[Google Material Icon Name]",
+      "label": "[Link Text]",
+      "action": "[Javascript Code]"
+    }
+  ],
+  "mongodb": {
+    "user": "[User Name]",
+    "pass": "[Password]",
+    "base": "[Database Name]",
+    "host": "[Host Name]"
+  }
 }
