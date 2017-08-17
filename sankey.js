@@ -12,15 +12,10 @@ var numCPUs = require('os').cpus().length,
 server.listen(config.port)
 console.log('Listen on Port ' + config.port)
 
-mongodb.connect(
-	'mongodb://' +
-		config.mongodb.user +
-		':' +
-		config.mongodb.pass +
-		'@' +
-		config.mongodb.host +
-		'/' +
-		config.mongodb.base,
+mongodb.connect((
+		config.mongodb.uri ||
+		'mongodb://' + config.mongodb.user + ':' + config.mongodb.pass + '@' + config.mongodb.host + '/' + config.mongodb.base
+	),
 	{
 		replSet: {
 			readPreference: 'primaryPreferred',
@@ -33,7 +28,7 @@ mongodb.connect(
 			mongo = db
 			console.log('MongoDB Connected')
 		}
-	},
+	}
 )
 
 function oeach(obj, callback) {
@@ -96,6 +91,87 @@ function keys(obj) {
 	return arr
 }
 
+function getDataCriteria(data) {
+	var find = {
+    metadata: { $exists: false },
+    date: {
+      $gte: new Date(data.zeitraum_min),
+      $lte: new Date(data.zeitraum_max),
+    },
+  }
+
+  oeach(data, function(o) {
+		var n = ''
+		if (o.key.substring(0, 7) === 'filter_') {
+			if (o.value !== 'ignore_filter') {
+				// LIST
+				n = 'list_'
+				if (o.key.substring(7, 7 + n.length) === n) {
+					find[o.key.substring(7 + n.length)] = o.value
+				}
+			}
+			if (o.value.length !== 0) {
+				// MULTILIST
+				n = 'multilist_'
+				if (o.key.substring(7, 7 + n.length) === n) {
+					find[o.key.substring(7 + n.length)] = {
+						$in: o.value,
+					}
+				}
+			}
+			if (o.value.length !== 0) {
+				// RANGE
+				n = 'range_'
+				if (o.key.substring(7, 7 + n.length) === n) {
+					if (find['$and'] === undefined) {
+						find['$and'] = []
+					}
+					if (o.value[0] !== '') {
+						find['$and'].push({})
+						var l = find['$and'].length - 1
+
+						find['$and'][l][o.key.substring(7 + n.length)] = {
+							$gte: +o.value[0],
+						}
+					}
+					if (o.value[1] !== '') {
+						find['$and'].push({})
+						var l = find['$and'].length - 1
+
+						find['$and'][l][o.key.substring(7 + n.length)] = {
+							$lte: +o.value[1],
+						}
+					}
+				}
+			}
+		}
+	})
+	if (find['$and'] !== undefined) {
+		while (find['$and'].length < 2) {
+			find['$and'].push({})
+		}
+	}
+
+	return find
+}
+
+function getDataProject(data) {
+	var project = {
+		date: 1,
+		count: 1,
+	}
+
+	if (data.sum !== '*') {
+		project[data.sum] = 1
+	}
+
+	for (var sci = data.schritt_min, scimax = data.schritt_max; sci <= scimax; sci += 1) {
+		project['p' + sci] = 1
+	}
+
+	return project
+}
+
 //io.use(cookieParserIo());
 
 app.set('views', __dirname + '/views')
@@ -104,7 +180,7 @@ app.use(
 	stylus.middleware({
 		src: __dirname + '/public',
 		compile: compile,
-	}),
+	})
 )
 app.use(express.static(__dirname + '/public'))
 
@@ -137,27 +213,15 @@ app.get('/', function(req, res) {
 
 io.sockets.on('connection', function(socket) {
 	var address = socket.handshake.address,
-		connected = true,
 		base = null,
-		basedata = null,
 		drill = {},
 		important = {},
 		hidden = {},
-		last_ts = 0,
 		cursor = null,
 		count = 0,
 		xpos = 0,
-		status_waiting = false,
 		status = function(data) {
-			//if (status_waiting === false) {
-			//process.nextTick(
-			//function () {
 			socket.emit('status', data)
-			//status_waiting = false;
-			//}
-			//);
-			//status_waiting = true;
-			//}
 		}
 
 	console.log(new Date(), address, 'connected')
@@ -168,10 +232,16 @@ io.sockets.on('connection', function(socket) {
 
 	function generate(data) {
 		var connections = {}
-		;(p = null), (c = null), (n = null), (cdrill = 'PC'), (ndrill = 'PC'), (ty = ['PC', 'N1', 'N2', 'N3']), (cname = ''), (nodes = {}), (links = {}), (nodeindex = 0), (list = cursor)
+		
+		// Change only when set
+		xpos = (data.schritt_min == null) ? xpos : +data.schritt_min
 
-		var concount = 0,
-			i = 0
+		var ty = ['PC', 'N1', 'N2', 'N3']
+		var nodes = {}
+		var links = {}
+		var nodeindex = 0
+		var list = cursor
+		var i = 0
 
 		var map = function(d) {
 			//status({ s: 1, i: i, c: count });
@@ -209,24 +279,22 @@ io.sockets.on('connection', function(socket) {
 				}
 			}
 
-			for (p = data.schritt_min; p < data.schritt_max; p += 1) {
-				c = 'p' + p
-				n = 'p' + (p + 1)
+			for (var p = data.schritt_min; p < data.schritt_max; p += 1) {
+				var c = 'p' + p
+				var n = 'p' + (p + 1)
 
-				cdrill = 'PC'
-				cparentdrill = ''
-				ndrill = 'PC'
-				nparentdrill = ''
+				var cdrill = 'PC'
+				var ndrill = 'PC'
 
-				clname = ''
-				nlname = ''
+				var clname = ''
+				var nlname = ''
 
 				if (d.value[c] && d.value[c][cdrill] && d.value[n] && d.value[n][ndrill]) {
 					clname = d.value[c][cdrill]
 					nlname = d.value[n][ndrill]
 					for (var dr in drill) {
 						if (drill.hasOwnProperty(dr)) {
-							if (p === drill[dr].pos) {
+							if (p === drill[dr].pos && drill[dr].drill.join('.') === clname) {
 								for (var dr_i = 0, dr_max = drill[dr].drill.length; dr_i < dr_max; dr_i += 1) {
 									if (d.value[c] && d.value[c][ty[dr_i]] === drill[dr].drill[dr_i]) {
 										cdrill = ty[dr_i + 1]
@@ -234,7 +302,7 @@ io.sockets.on('connection', function(socket) {
 									}
 								}
 							}
-							if (p + 1 === drill[dr].pos) {
+							if (p + 1 === drill[dr].pos && drill[dr].drill.join('.') === nlname) {
 								for (var dr_i = 0, dr_max = drill[dr].drill.length; dr_i < dr_max; dr_i += 1) {
 									if (d.value[n] && d.value[n][ty[dr_i]] === drill[dr].drill[dr_i]) {
 										ndrill = ty[dr_i + 1]
@@ -245,10 +313,14 @@ io.sockets.on('connection', function(socket) {
 						}
 					}
 
-					if (!nodes[p + ' - ' + d.value[c][cdrill]]) {
-						nodes[p + ' - ' + d.value[c][cdrill]] = {
+					// This will preserve child/parent relations
+					var ckey = p + ' - ' + clname
+					var nkey = p + 1 + ' - ' + nlname
+
+					if (!nodes[ckey]) {
+						nodes[ckey] = {
 							count: 0,
-							name: p + ' - ' + d.value[c][cdrill],
+							name: ckey,
 							drill: cdrill,
 							pos: p,
 							xPos: p - xpos,
@@ -260,10 +332,10 @@ io.sockets.on('connection', function(socket) {
 						}
 						nodeindex += 1
 					}
-					if (!nodes[p + 1 + ' - ' + d.value[n][ndrill]]) {
-						nodes[p + 1 + ' - ' + d.value[n][ndrill]] = {
+					if (!nodes[nkey]) {
+						nodes[nkey] = {
 							count: 0,
-							name: p + 1 + ' - ' + d.value[n][ndrill],
+							name: nkey,
 							drill: ndrill,
 							pos: p + 1,
 							xPos: p + 1 - xpos,
@@ -276,20 +348,19 @@ io.sockets.on('connection', function(socket) {
 						nodeindex += 1
 					}
 
-					cname = p + '|' + clname + '|' + (p + 1) + '|' + nlname
+					var cname = p + '|' + clname + '|' + (p + 1) + '|' + nlname
 					if (!links[cname]) {
 						links[cname] = {
-							source: nodes[p + ' - ' + d.value[c][cdrill]].nodeindex,
-							target: nodes[p + 1 + ' - ' + d.value[n][ndrill]].nodeindex,
+							source: nodes[ckey].nodeindex,
+							target: nodes[nkey].nodeindex,
 							value: 0,
 						}
 					}
 
-					nodes[p + ' - ' + d.value[c][cdrill]].count +=
-						(data.sum === '*' ? d.value.count : d.value[data.sum]) || 1
-					nodes[p + 1 + ' - ' + d.value[n][ndrill]].count +=
-						(data.sum === '*' ? d.value.count : d.value[data.sum]) || 1
-					links[cname].value += (data.sum === '*' ? d.value.count : d.value[data.sum]) || 1
+					var inc = (data.sum === '*' ? d.value.count : d.value[data.sum]) || 1
+					nodes[ckey].count += inc
+					nodes[nkey].count += inc
+					links[cname].value += inc
 				}
 			}
 		}
@@ -315,81 +386,11 @@ io.sockets.on('connection', function(socket) {
 	socket.on('generate_sankey', function(data) {
 		status({ s: 0, c: base })
 
-		var connections = {}
-		;(p = null), (c = null), (n = null), (cdrill = 'PC'), (ndrill = 'PC'), (cname = ''), (cur = null), (nodes = []), (links = []), (stats = null), (find = {}), (project = {})
-
-		xpos = data.schritt_min
 		count = 0
-		find.metadata = { $exists: false }
-		find.date = {
-			$gte: new Date(data.zeitraum_min),
-			$lte: new Date(data.zeitraum_max),
-		}
 
-		oeach(data, function(o) {
-			var n = ''
-			if (o.key.substring(0, 7) === 'filter_') {
-				if (o.value !== 'ignore_filter') {
-					// LIST
-					n = 'list_'
-					if (o.key.substring(7, 7 + n.length) === n) {
-						find[o.key.substring(7 + n.length)] = o.value
-					}
-				}
-				if (o.value.length !== 0) {
-					// MULTILIST
-					n = 'multilist_'
-					if (o.key.substring(7, 7 + n.length) === n) {
-						find[o.key.substring(7 + n.length)] = {
-							$in: o.value,
-						}
-					}
-				}
-				if (o.value.length !== 0) {
-					// RANGE
-					n = 'range_'
-					if (o.key.substring(7, 7 + n.length) === n) {
-						if (find['$and'] === undefined) {
-							find['$and'] = []
-						}
-						if (o.value[0] !== '') {
-							find['$and'].push({})
-							var l = find['$and'].length - 1
-
-							find['$and'][l][o.key.substring(7 + n.length)] = {
-								$gte: +o.value[0],
-							}
-						}
-						if (o.value[1] !== '') {
-							find['$and'].push({})
-							var l = find['$and'].length - 1
-
-							find['$and'][l][o.key.substring(7 + n.length)] = {
-								$lte: +o.value[1],
-							}
-						}
-					}
-				}
-			}
-		})
-		if (find['$and'] !== undefined) {
-			while (find['$and'].length < 2) {
-				find['$and'].push({})
-			}
-		}
-
-		project = {
-			date: 1,
-			count: 1,
-		}
-		if (data.sum !== '*') {
-			project[data.sum] = 1
-		}
-
-		for (var sci = data.schritt_min, scimax = data.schritt_max; sci <= scimax; sci += 1) {
-			project['p' + sci] = '$p' + sci
-		}
-		cur = mongo.collection(base).find(find, project)
+		var criteria = getDataCriteria(data)
+		var project = getDataProject(data)
+		var cur = mongo.collection(base).find(criteria, project)
 
 		cur.count(function(err, ccount) {
 			if (err) {
@@ -499,7 +500,7 @@ io.sockets.on('connection', function(socket) {
 				},
 				function(err, html) {
 					socket.emit('help', html)
-				},
+				}
 			)
 		})
 	})
