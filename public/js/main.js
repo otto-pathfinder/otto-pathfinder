@@ -1782,6 +1782,10 @@ window.addEventListener(
 							context	.append(data.drill !== 'N3' ? 'div' : 'span')
 									.text('Drilldown und nur Pfade mit diesem Knoten anzeigen')
 									.on('click', function (d, i) {
+										if (data.drill === 'N3') {
+											// Don't send change when disabled
+											return
+										}
 										var target = 'PC';
 										switch (data.drill) {
 											case 'PC': target = 'N1'; break;
@@ -1806,6 +1810,10 @@ window.addEventListener(
 							context	.append(data.drill !== 'PC' ? 'div' : 'span')
 									.text('Drillup')
 									.on('click', function (d, i) {
+										if (data.drill === 'PC') {
+											// Don't send change when disabled
+											return
+										}
 										change({
 											'type': 'drillup',
 											'name': data.data.label,
@@ -1816,6 +1824,10 @@ window.addEventListener(
 							context	.append(data.drill !== 'N3' ? 'div' : 'span')
 									.text('Drilldown')
 									.on('click', function (d, i) {
+										if (data.drill === 'N3') {
+											// Don't send change when disabled
+											return
+										}
 										change({
 											'type': 'drilldown',
 											'name': data.data.label,
