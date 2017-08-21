@@ -1,13 +1,13 @@
 {
-	"name": "OTTO-SankeyEngine",
-	"description": "OTTO SankeyEngine",
-	"author": "OTTO GmbH & Co. KG",
-	"dependencies": {
-		"express": "*",
-		"jade": "*",
-		"mongodb": "*",
-		"nib": "*",
-		"socket.io": "*",
-		"stylus": "*"
-	}
+  "name": "OTTO-SankeyEngine",
+  "description": "OTTO SankeyEngine",
+  "author": "OTTO GmbH & Co. KG",
+  "dependencies": {
+    "express": "^4.15.4",
+    "jade": "^1.11.0",
+    "mongodb": "^2.2.31",
+    "nib": "^1.1.2",
+    "socket.io": "^1.7.4",
+    "stylus": "^0.54.5"
+  }
 }
