@@ -1,0 +1,19 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+
+# testing
+coverage
+
+# production
+build
+publish
+public/style/main.css
+
+# misc
+.vscode
+.chrome
+.DS_Store
+.env
+*.log
