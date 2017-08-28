@@ -458,6 +458,7 @@ var param = {},
 							schritt_max:	$('#SchritteMax')[0],
 							zeitraum_min:	$('#ZeitraumMin')[0],
 							zeitraum_max:	$('#ZeitraumMax')[0],
+							sum:          $('#Sum')[0],
 							btn:			$('#btn')[0]
 						};
 		var dis = false;
@@ -489,6 +490,7 @@ var param = {},
 		data.schritt_max =		+elements.schritt_max.value;
 		data.zeitraum_min =		elements.zeitraum_min.value;
 		data.zeitraum_max =		elements.zeitraum_max.value;
+		data.sum          =		elements.sum.value;
 		
 		socket.emit('change', data);
 	},
@@ -836,6 +838,7 @@ function conf_submit_(event) {
 						schritt_max:	$('#SchritteMax')[0],
 						zeitraum_min:	$('#ZeitraumMin')[0],
 						zeitraum_max:	$('#ZeitraumMax')[0],
+						sum:          $('#Sum')[0],
 						btn:			$('#btn')[0]
 					};
 	var dis = false;
@@ -862,6 +865,7 @@ function conf_submit_(event) {
 	spinner(c);
 	
 	socket.emit('generate_sankey', {
+		sum: elements.sum.value,
 		vorkommen_min:	+elements.vorkommen_min.value,
 		vorkommen_max:	+elements.vorkommen_max.value,
 		schritt_min:	+elements.schritt_min.value,
@@ -1778,6 +1782,10 @@ window.addEventListener(
 							context	.append(data.drill !== 'N3' ? 'div' : 'span')
 									.text('Drilldown und nur Pfade mit diesem Knoten anzeigen')
 									.on('click', function (d, i) {
+										if (data.drill === 'N3') {
+											// Don't send change when disabled
+											return
+										}
 										var target = 'PC';
 										switch (data.drill) {
 											case 'PC': target = 'N1'; break;
@@ -1802,6 +1810,10 @@ window.addEventListener(
 							context	.append(data.drill !== 'PC' ? 'div' : 'span')
 									.text('Drillup')
 									.on('click', function (d, i) {
+										if (data.drill === 'PC') {
+											// Don't send change when disabled
+											return
+										}
 										change({
 											'type': 'drillup',
 											'name': data.data.label,
@@ -1812,6 +1824,10 @@ window.addEventListener(
 							context	.append(data.drill !== 'N3' ? 'div' : 'span')
 									.text('Drilldown')
 									.on('click', function (d, i) {
+										if (data.drill === 'N3') {
+											// Don't send change when disabled
+											return
+										}
 										change({
 											'type': 'drilldown',
 											'name': data.data.label,
